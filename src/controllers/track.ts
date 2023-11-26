@@ -74,6 +74,25 @@ const sanitizeBodyForDatabase = (body: SerializedBody, trackId: number) => {
   return sanitized;
 };
 
+export const getTrack = async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  const track: Track = await knex("track").where({ id }).first();
+  if (!track) {
+    return res.status(404).json({
+      message: errorMessages.trackNotFound(id),
+    });
+  }
+
+  track.previewOnPlayback = !!track.previewOnPlayback;
+  const bodies: SerializedBody[] = await knex("body").where("track_id", id);
+  const initialState = bodies.map((body) => sanitizeBodyForDatabase(body, id));
+
+  return res.status(200).json({
+    ...track,
+    initialState,
+  });
+};
+
 export const postTrack = async (req: AuthRequest, res: Response) => {
   if (!req.isLoggedIn) {
     return res.status(401).json({
@@ -124,7 +143,11 @@ export const putTrack = async (req: AuthRequest, res: Response) => {
   const id = parseInt(req.params.id);
   const userId = req.tokenPayload.id;
   const trackUserId = await knex("track").where({ id }).select("user_id").first();
-  console.log(id, userId, trackUserId);
+  if (!trackUserId) {
+    return res.status(404).json({
+      message: errorMessages.trackNotFound(id),
+    });
+  }
   if (!userId || userId !== trackUserId.user_id) {
     return await postTrack(req, res);
   }
@@ -148,23 +171,37 @@ export const putTrack = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getTrack = async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  const track: Track = await knex("track").where({ id }).first();
-  if (!track) {
-    return res.status(404).json({
-      message: errorMessages.trackNotFound,
+export const deleteTrack = async (req: AuthRequest, res: Response) => {
+  if (!req.isLoggedIn) {
+    return res.status(401).json({
+      message: errorMessages.notLogged(),
     });
   }
 
-  track.previewOnPlayback = !!track.previewOnPlayback;
-  const bodies: SerializedBody[] = await knex("body").where("track_id", id);
-  const initialState = bodies.map((body) => sanitizeBodyForDatabase(body, id));
+  const id = parseInt(req.params.id);
+  const userId = req.tokenPayload.id;
+  const trackUserId = await knex("track").where({ id }).select("user_id").first();
+  if (!trackUserId) {
+    return res.status(404).json({
+      message: errorMessages.trackNotFound(id),
+    });
+  }
+  if (!userId || userId !== trackUserId.user_id) {
+    return res.status(403).json({
+      message: errorMessages.deleteFailed(id),
+    });
+  }
 
-  return res.status(200).json({
-    ...track,
-    initialState,
-  });
+  try {
+    await knex("body").where("track_id", id).delete();
+    await knex("track").where({ id }).delete();
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unknown error",
+      error,
+    });
+  }
 };
 
 const knex = configure(knexfile);

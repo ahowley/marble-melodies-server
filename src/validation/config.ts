@@ -23,4 +23,5 @@ export const errorMessages = {
   passwordSpecial: () => "Password must contain at least 1 special character.",
   failedPasswordEncryption: () => "Failed to encrypt password.",
   trackNotFound: (trackId: number) => `There was no track found with id ${trackId}`,
+  deleteFailed: (trackId: number) => `User can't delete unowned track: ${trackId}.`,
 };
