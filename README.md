@@ -15,7 +15,7 @@ npm i
 - Create MySQL database:
 
 ```bash
-mysql
+mysql -u username -p password
 ```
 
 ```sql
