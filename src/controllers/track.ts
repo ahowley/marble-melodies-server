@@ -8,13 +8,13 @@ import { errorMessages } from "../validation/config.js";
 type SerializedBody = {
   track_id: number;
   type: "marble" | "track-block" | "note-block";
-  x: number;
-  y: number;
-  rotation: number;
+  x: number | string;
+  y: number | string;
+  rotation: number | string;
   isStatic: boolean;
-  radius?: number;
-  width?: number;
-  height?: number;
+  radius?: number | string;
+  width?: number | string;
+  height?: number | string;
   gradientStart?: string | number;
   gradientEnd?: string | number;
   frontColor?: string;
@@ -39,9 +39,9 @@ const sanitizeBodyForDatabase = (body: SerializedBody, trackId: number) => {
   const sanitized: SerializedBody = {
     track_id: trackId,
     type: body.type,
-    x: body.x,
-    y: body.y,
-    rotation: body.rotation,
+    x: typeof body.x === "string" ? parseFloat(body.x) : body.x,
+    y: typeof body.y === "string" ? parseFloat(body.y) : body.y,
+    rotation: typeof body.rotation === "string" ? parseFloat(body.rotation) : body.rotation,
     isStatic: !!body.isStatic,
   };
 
@@ -51,12 +51,12 @@ const sanitizeBodyForDatabase = (body: SerializedBody, trackId: number) => {
   }
 
   if (body.type === "note-block" || body.type === "track-block") {
-    sanitized.width = body.width;
-    sanitized.height = body.height;
+    sanitized.width = typeof body.width === "string" ? parseFloat(body.width) : body.width;
+    sanitized.height = typeof body.height === "string" ? parseFloat(body.height) : body.height;
   }
 
   if (body.type === "marble") {
-    sanitized.radius = body.radius;
+    sanitized.radius = typeof body.radius === "string" ? parseFloat(body.radius) : body.radius;
     sanitized.cameraTracking = !!body.cameraTracking;
   }
 

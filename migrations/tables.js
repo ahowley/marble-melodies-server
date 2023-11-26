@@ -34,13 +34,13 @@ export const up = function (knex) {
         .onDelete("CASCADE")
         .onUpdate("CASCADE");
       table.string("type").notNullable();
-      table.double("x").notNullable();
-      table.double("y").notNullable();
-      table.double("rotation").notNullable();
-      table.double("radius");
+      table.decimal("x", 26, 20).notNullable();
+      table.decimal("y", 26, 20).notNullable();
+      table.decimal("rotation", 26, 20).notNullable();
+      table.decimal("radius", 26, 20);
       table.boolean("isStatic");
-      table.double("width");
-      table.double("height");
+      table.decimal("width", 26, 20);
+      table.decimal("height", 26, 20);
       table.string("frontColor");
       table.string("backColor");
       table.string("gradientStart");
