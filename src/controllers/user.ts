@@ -24,12 +24,10 @@ export const register = async (req: Request, res: Response) => {
   if (!validationErrors.isEmpty()) {
     return res.status(400).json({
       message: errorMessages.invalid(),
-      errors: validationErrors
-        .array()
-        .map((error: FieldValidationError) => ({
-          ...error,
-          value: error.path === "password" ? "hidden" : error.value,
-        })),
+      errors: validationErrors.array().map((error: FieldValidationError) => ({
+        ...error,
+        value: error.path === "password" ? "hidden" : error.value,
+      })),
     });
   }
 
@@ -43,7 +41,7 @@ export const register = async (req: Request, res: Response) => {
 
     const newUserId = await knex("user").insert([{ username, password_hash }]);
     res.status(201).json({
-      id: newUserId,
+      id: newUserId[0],
     });
   });
 };
