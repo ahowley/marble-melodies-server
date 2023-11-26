@@ -1,15 +1,11 @@
-import path from "path";
-import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 
 import userRouter from "./routes/user.js";
 import trackRouter from "./routes/track.js";
+import { useDotenv } from "./validation/config.js";
 
-const entry = new URL(import.meta.url).pathname;
-const __dirname = path.dirname(entry).replace("/src", "");
-dotenv.config({ path: `${__dirname}/.env` });
-
+useDotenv();
 const app = express();
 const PORT = process.env.PORT;
 

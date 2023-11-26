@@ -66,6 +66,7 @@ npm run rollback
 - express
 - express-validator
 - jsonwebtoken
+- bcrypt
 - knex
 - mysql2
 - cors

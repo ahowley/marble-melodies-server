@@ -1,10 +1,10 @@
+import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { hash, compare } from "bcrypt";
-import { Request, Response } from "express";
 import { validationResult, matchedData } from "express-validator";
 import configure from "knex";
 import knexfile from "../../knexfile.js";
-import { errorMessages } from "../validation/config.js";
+import { errorMessages, useDotenv } from "../validation/config.js";
 
 type User = {
   id: number;
@@ -13,6 +13,7 @@ type User = {
 };
 export type TokenPayload = Omit<User, "password_hash">;
 
+useDotenv();
 const JWT_KEY = process.env.JWT_KEY;
 const knex = configure(knexfile);
 

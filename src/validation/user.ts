@@ -1,13 +1,18 @@
+import { NextFunction, Response } from "express";
+import { body } from "express-validator";
+import jwt from "jsonwebtoken";
 import configure from "knex";
 import knexfile from "../../knexfile.js";
-import { MIN_PASSWORD_LENGTH, errorMessages } from "./config.js";
-import { body } from "express-validator";
-import { requiredValidator } from "./common.js";
+import { MIN_PASSWORD_LENGTH, errorMessages, useDotenv } from "./config.js";
+import { AuthRequest, requiredValidator } from "./common.js";
+import { TokenPayload } from "../controllers/user.js";
 
+useDotenv();
 const knex = configure(knexfile);
+const JWT_KEY = process.env.JWT_KEY;
 
 const validateUniqueUsername = async (username: string) => {
-  const usernames = await knex("user").select("username").where({ username: username });
+  const usernames = await knex("user").select("username").where({ username });
   if (usernames.length) {
     throw new Error(errorMessages.unique("username"));
   }
@@ -28,3 +33,26 @@ export const passwordValidators = () => [
 ];
 
 export const loginValidators = () => [requiredValidator("username"), requiredValidator("password")];
+
+export const authorizeValidator = (req: AuthRequest, _res: Response, next: NextFunction) => {
+  req.isLoggedIn = true;
+  const { authorization } = req.headers;
+
+  if (!authorization || !authorization.includes("Bearer ")) {
+    req.isLoggedIn = false;
+    return;
+  }
+
+  const token = authorization.replace("Bearer ", "");
+  jwt.verify(token, JWT_KEY, (error, payload: TokenPayload) => {
+    if (error) {
+      console.log(error);
+      req.isLoggedIn = false;
+      return;
+    }
+
+    req.tokenPayload = payload;
+  });
+
+  next();
+};

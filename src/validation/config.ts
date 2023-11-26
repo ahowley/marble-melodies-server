@@ -1,3 +1,10 @@
+import dotenv from "dotenv";
+import path from "path";
+
+const entry = new URL(import.meta.url).pathname;
+const __dirname = path.dirname(entry).replace("/src/validation", "");
+export const useDotenv = () => dotenv.config({ path: `${__dirname}/.env` });
+
 export const MIN_PASSWORD_LENGTH = 10;
 
 export const errorMessages = {
@@ -15,4 +22,5 @@ export const errorMessages = {
   passwordUppercase: () => "Password must contain at least 1 uppercase character.",
   passwordSpecial: () => "Password must contain at least 1 special character.",
   failedPasswordEncryption: () => "Failed to encrypt password.",
+  trackNotFound: (trackId: number) => `There was no track found with id ${trackId}`,
 };
