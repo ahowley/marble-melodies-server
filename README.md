@@ -57,7 +57,8 @@ npm run rollback
 
 - Node
 - TypeScript
-- Express
+- Express + Express-Validator
+- JSON Web Token + BCrypt
 - Knex + MySQL
 
 ### App Dependencies
@@ -74,7 +75,9 @@ npm run rollback
 
 - ts-node
 - typescript
+- @types/jsonwebtoken
 - @types/cors
 - @types/express
 - @types/express-validator
 - @types/node
+- @types/bcrypt

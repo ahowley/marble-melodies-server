@@ -11,10 +11,10 @@ const __dirname = path.dirname(entry).replace("/src", "");
 dotenv.config({ path: `${__dirname}/.env` });
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 
 app.use(express.json());
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000" }));
+app.use(cors({ origin: process.env.FRONTEND_URL }));
 
 app.use("/user", userRouter);
 app.use("/track", trackRouter);

@@ -25,6 +25,14 @@ export const up = function (knex) {
     })
     .createTable("body", (table) => {
       table.increments("id").primary();
+      table
+        .integer("track_id")
+        .notNullable()
+        .unsigned()
+        .references("id")
+        .inTable("track")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
       table.string("type").notNullable();
       table.double("x").notNullable();
       table.double("y").notNullable();
