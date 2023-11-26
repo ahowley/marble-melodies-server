@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { hash, compare } from "bcrypt";
-import { validationResult, matchedData } from "express-validator";
+import { validationResult, matchedData, FieldValidationError } from "express-validator";
 import configure from "knex";
 import knexfile from "../../knexfile.js";
 import { errorMessages, useDotenv } from "../validation/config.js";
+import { error } from "console";
 
 type User = {
   id: number;
@@ -23,7 +24,12 @@ export const register = async (req: Request, res: Response) => {
   if (!validationErrors.isEmpty()) {
     return res.status(400).json({
       message: errorMessages.invalid(),
-      errors: validationErrors.array(),
+      errors: validationErrors
+        .array()
+        .map((error: FieldValidationError) => ({
+          ...error,
+          value: error.path === "password" ? "hidden" : error.value,
+        })),
     });
   }
 

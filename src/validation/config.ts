@@ -13,7 +13,8 @@ export const errorMessages = {
   required: (field: string) => `'${field}' is a required field, but no value was provided.`,
   wrongType: (field: string, expectedType: string) =>
     `The value of '${field}' provided was the wrong type. Provided: '${typeof field}' | Expected: ${expectedType}`,
-  unique: (field: string) => `'${field}' must be a unique value.`,
+  unique: (field: string) =>
+    `'${field[0].toUpperCase()}${field.slice(1)}' has to be unique, but the submitted value is already taken.`,
   auth: () => "Incorrect username or password.",
   notLogged: () => "User must be logged in to use this endpoint.",
   passwordWhitespace: () => "Password cannot contain whitespace.",
