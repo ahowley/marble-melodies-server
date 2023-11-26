@@ -1,8 +1,8 @@
 # Marble Melodies (Server)
 
-This is the server for (Marble Melodies)[https://github.com/ahowley/marble-melodies/tree/dev], a capstone project from
-the September 2023 cohort of [BrainStation's](https://brainstation.io/) Software Engineering bootcamp. For more info,
-see the (client repo here)[https://github.com/ahowley/marble-melodies/tree/dev].
+This is the server for [Marble Melodies](https://github.com/ahowley/marble-melodies), a capstone project from the
+September 2023 cohort of [BrainStation's](https://brainstation.io/) Software Engineering bootcamp. For more info, see
+the [client repo here](https://github.com/ahowley/marble-melodies/tree/dev).
 
 ## Server Installation
 
