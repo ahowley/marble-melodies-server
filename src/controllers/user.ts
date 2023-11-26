@@ -5,7 +5,6 @@ import { validationResult, matchedData, FieldValidationError } from "express-val
 import configure from "knex";
 import knexfile from "../../knexfile.js";
 import { errorMessages, useDotenv } from "../validation/config.js";
-import { error } from "console";
 
 type User = {
   id: number;
