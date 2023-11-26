@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from "express";
+import { Request } from "express";
 import { body, header } from "express-validator";
-import { errorMessages, useDotenv } from "./config.js";
+import { errorMessages } from "./config.js";
 import { TokenPayload } from "../controllers/user.js";
 
 export type AuthRequest = Request & {
