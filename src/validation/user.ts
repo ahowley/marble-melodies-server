@@ -46,7 +46,6 @@ export const authorizeValidator = (req: AuthRequest, _res: Response, next: NextF
   const token = authorization.replace("Bearer ", "");
   jwt.verify(token, JWT_KEY, (error, payload: TokenPayload) => {
     if (error) {
-      console.log(error);
       req.isLoggedIn = false;
       return;
     }

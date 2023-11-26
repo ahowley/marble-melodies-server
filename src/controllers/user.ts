@@ -68,6 +68,6 @@ export const login = async (req: Request, res: Response) => {
     const payload: TokenPayload = { id: user.id, username: user.username };
     const token = jwt.sign(payload, JWT_KEY);
 
-    return res.status(200).json({ token });
+    return res.status(200).json({ id: user.id, token });
   });
 };

@@ -26,12 +26,13 @@ type SerializedBody = {
 };
 type PostRequestBody = {
   name: string;
-  previewOnPlayback: string;
+  previewOnPlayback: boolean;
   volume: number;
   initialState: SerializedBody[];
 };
 type Track = PostRequestBody & {
   id: number;
+  user_id: number;
 };
 
 const sanitizeBodyForDatabase = (body: SerializedBody, trackId: number) => {
@@ -41,7 +42,7 @@ const sanitizeBodyForDatabase = (body: SerializedBody, trackId: number) => {
     x: body.x,
     y: body.y,
     rotation: body.rotation,
-    isStatic: body.isStatic,
+    isStatic: !!body.isStatic,
   };
 
   if (body.type === "marble" || body.type === "note-block") {
@@ -56,7 +57,7 @@ const sanitizeBodyForDatabase = (body: SerializedBody, trackId: number) => {
 
   if (body.type === "marble") {
     sanitized.radius = body.radius;
-    sanitized.cameraTracking = body.cameraTracking;
+    sanitized.cameraTracking = !!body.cameraTracking;
   }
 
   if (body.type === "track-block") {
@@ -94,9 +95,51 @@ export const postTrack = async (req: AuthRequest, res: Response) => {
     const user_id = tokenPayload.id;
     const trackId = await knex("track").insert([{ name, user_id, previewOnPlayback, volume }]);
     const serializedBodies: SerializedBody[] = initialState.map((body) => sanitizeBodyForDatabase(body, trackId[0]));
-    const bodyIds = await knex("body").insert(serializedBodies);
+    await knex("body").insert(serializedBodies);
 
-    return res.status(201).json({ trackId: trackId[0], firstBodyId: bodyIds[0] });
+    return res.status(201).json({ trackId: trackId[0], message: "New track saved!" });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unknown error",
+      error,
+    });
+  }
+};
+
+export const putTrack = async (req: AuthRequest, res: Response) => {
+  if (!req.isLoggedIn) {
+    return res.status(401).json({
+      message: errorMessages.notLogged(),
+    });
+  }
+
+  const validationErrors = validationResult(req);
+  if (!validationErrors.isEmpty()) {
+    return res.status(400).json({
+      message: errorMessages.invalid(),
+      errors: validationErrors.array(),
+    });
+  }
+
+  const id = parseInt(req.params.id);
+  const userId = req.tokenPayload.id;
+  const trackUserId = await knex("track").where({ id }).select("user_id").first();
+  console.log(id, userId, trackUserId);
+  if (!userId || userId !== trackUserId.user_id) {
+    return await postTrack(req, res);
+  }
+
+  try {
+    const { name, previewOnPlayback, volume, initialState } = matchedData(req) as PostRequestBody;
+    await knex("body").where("track_id", id).delete();
+
+    const serializedBodies: SerializedBody[] = initialState.map((body) => sanitizeBodyForDatabase(body, id));
+    Promise.all([
+      knex("body").insert(serializedBodies),
+      knex("track").where({ id }).update({ name, previewOnPlayback, volume }),
+    ]);
+
+    return res.status(201).json({ trackId: id, message: "Track updated!" });
   } catch (error) {
     return res.status(500).json({
       message: "Unknown error",
@@ -114,7 +157,8 @@ export const getTrack = async (req: Request, res: Response) => {
     });
   }
 
-  const bodies: SerializedBody[] = await knex("body").join("track", "track.id", "body.track_id").where("track.id", id);
+  track.previewOnPlayback = !!track.previewOnPlayback;
+  const bodies: SerializedBody[] = await knex("body").where("track_id", id);
   const initialState = bodies.map((body) => sanitizeBodyForDatabase(body, id));
 
   return res.status(200).json({

@@ -19,8 +19,3 @@ export const postValidators = () => [
   requiredValidator("volume"),
   requiredValidator("initialState"),
 ];
-
-export const putValidators = () => [
-  body("id", errorMessages.trackNotFound).notEmpty().custom(validateTrackExists),
-  ...postValidators(),
-];
