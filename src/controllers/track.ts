@@ -76,6 +76,12 @@ const sanitizeBodyForDatabase = (body: SerializedBody, trackId: number) => {
 
 export const getTrack = async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
+  if (Number.isNaN(id)) {
+    return res.status(404).json({
+      message: errorMessages.trackNotFound(id),
+    });
+  }
+
   const track: Track = await knex("track").where({ id }).first();
   if (!track) {
     return res.status(404).json({
@@ -150,6 +156,12 @@ export const putTrack = async (req: AuthRequest, res: Response) => {
   }
 
   const id = parseInt(req.params.id);
+  if (Number.isNaN(id)) {
+    return res.status(404).json({
+      message: errorMessages.trackNotFound(id),
+    });
+  }
+
   const userId = req.tokenPayload.id;
   const trackUserId = await knex("track").where({ id }).select("user_id").first();
   if (!trackUserId) {
