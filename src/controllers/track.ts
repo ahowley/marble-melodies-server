@@ -93,6 +93,12 @@ export const getTrack = async (req: Request, res: Response) => {
   });
 };
 
+export const getTracks = async (req: Request, res: Response) => {
+  const tracks = await knex("track").join("user", "user.id", "track.user_id").select("track.id", "name", "username");
+
+  res.status(200).json(tracks);
+};
+
 export const postTrack = async (req: AuthRequest, res: Response) => {
   if (!req.isLoggedIn) {
     return res.status(401).json({
