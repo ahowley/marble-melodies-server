@@ -1,9 +1,8 @@
-import path from "path";
 import "dotenv/config";
 
 export default {
   client: "mysql2",
-  connection: {
+  connection: process.env.DB_URL || {
     host: process.env.DB_HOST,
     database: process.env.DB_NAME,
     user: process.env.DB_USER,
