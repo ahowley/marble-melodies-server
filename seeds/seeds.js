@@ -3,10 +3,9 @@ export const seed = async (knex) => {
   await knex("track").del();
   await knex("user").del();
 
-  await knex("user").insert([{ id: 1, username: "Test User", password_hash: "test" }]);
-  await knex("user").insert([{ id: 2, username: "Beyonce", password_hash: "test" }]);
+  await knex("user").insert([{ id: 1, username: "Alex", password_hash: "test" }]);
   await knex("track").insert([{ id: 1, user_id: 1, name: "Zelda", previewOnPlayback: false, volume: 0.5 }]);
-  await knex("track").insert([{ id: 2, user_id: 2, name: "Mission Impossible", previewOnPlayback: true, volume: 0.6 }]);
+  await knex("track").insert([{ id: 2, user_id: 1, name: "Mission Impossible", previewOnPlayback: true, volume: 0.6 }]);
   await knex("body").insert([
     {
       id: 1,
