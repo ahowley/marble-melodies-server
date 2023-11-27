@@ -5,6 +5,7 @@ import { validationResult, matchedData, FieldValidationError } from "express-val
 import configure from "knex";
 import knexfile from "../../knexfile.js";
 import { errorMessages, useDotenv } from "../validation/config.js";
+import { AuthRequest } from "../validation/common.js";
 
 type User = {
   id: number;
@@ -73,4 +74,20 @@ export const login = async (req: Request, res: Response) => {
 
     return res.status(200).json({ id: user.id, token });
   });
+};
+
+export const getTracks = async (req: AuthRequest, res: Response) => {
+  if (!req.isLoggedIn) {
+    return res.status(401).json({
+      message: errorMessages.auth(),
+    });
+  }
+
+  const { id } = req.tokenPayload;
+  const tracks = await knex("track")
+    .join("user", "user.id", "track.user_id")
+    .select("track.id", "name", "username")
+    .where({ "user.id": id });
+
+  res.status(200).json(tracks);
 };
