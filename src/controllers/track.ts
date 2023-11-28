@@ -103,7 +103,7 @@ export const getTracks = async (_req: Request, res: Response) => {
   const tracks = await knex("track")
     .join("user", "user.id", "track.user_id")
     .select("track.id", "name", "username")
-    .limit(20);
+    .limit(18);
 
   res.status(200).json(tracks);
 };
